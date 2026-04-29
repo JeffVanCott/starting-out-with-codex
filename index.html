@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codex Tool Builder Guide</title>
+  <meta
+    name="description"
+    content="A beginner-friendly single HTML guide for using the Codex app, GitHub, and Netlify to build and ship simple tools."
+  >
+  <style>
+    :root {
+      --bg: #f3ede2;
+      --panel: rgba(255, 251, 245, 0.82);
+      --panel-strong: #fffaf1;
+      --ink: #1f2933;
+      --muted: #5b6470;
+      --line: rgba(31, 41, 51, 0.12);
+      --accent: #c4492d;
+      --accent-2: #0a7c66;
+      --accent-3: #f0b429;
+      --shadow: 0 24px 80px rgba(58, 43, 24, 0.12);
+      --radius: 24px;
+      --font-display: "Avenir Next", "Segoe UI", sans-serif;
+      --font-body: "Georgia", "Times New Roman", serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(240, 180, 41, 0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(10, 124, 102, 0.18), transparent 22%),
+        linear-gradient(160deg, #f5efe4 0%, #efe4d0 46%, #f8f4ec 100%);
+      font-family: var(--font-body);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        linear-gradient(rgba(31, 41, 51, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 41, 51, 0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent 92%);
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: calc(var(--radius) + 8px);
+      background: linear-gradient(145deg, rgba(255, 250, 241, 0.95), rgba(255, 247, 235, 0.78));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      animation: rise 0.7s ease-out both;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      right: -40px;
+      top: -80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(196, 73, 45, 0.22), transparent 68%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(196, 73, 45, 0.18);
+      background: rgba(255, 255, 255, 0.7);
+      font: 700 0.8rem/1 var(--font-display);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      line-height: 0.98;
+    }
+
+    h1 {
+      margin-top: 18px;
+      max-width: 10ch;
+      font-size: clamp(3rem, 7vw, 6.8rem);
+      letter-spacing: -0.06em;
+    }
+
+    .lead {
+      max-width: 58ch;
+      margin: 20px 0 0;
+      font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 22px;
+      align-items: end;
+      margin-top: 28px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font: 700 0.95rem/1 var(--font-display);
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+      text-decoration: none;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-2px);
+    }
+
+    .button.primary {
+      background: var(--ink);
+      color: white;
+      box-shadow: 0 16px 28px rgba(31, 41, 51, 0.18);
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--ink);
+      border: 1px solid rgba(31, 41, 51, 0.1);
+    }
+
+    .hero-card,
+    .panel {
+      border-radius: var(--radius);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 40px rgba(58, 43, 24, 0.08);
+    }
+
+    .hero-card {
+      padding: 18px;
+      transform: rotate(-2deg);
+    }
+
+    .hero-card-inner {
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(160deg, rgba(196, 73, 45, 0.08), rgba(10, 124, 102, 0.12));
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+    }
+
+    .metric strong {
+      display: block;
+      font: 700 1.4rem/1 var(--font-display);
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .panel {
+      padding: 24px;
+      animation: rise 0.8s ease-out both;
+    }
+
+    .panel:nth-child(2) {
+      animation-delay: 0.08s;
+    }
+
+    .panel h2 {
+      font-size: clamp(2rem, 3vw, 2.8rem);
+      letter-spacing: -0.05em;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .feature-list,
+    .check-list,
+    .deploy-steps {
+      display: grid;
+      gap: 12px;
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .feature-item,
+    .check-item,
+    .deploy-step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+    }
+
+    .step-pill {
+      display: inline-grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: white;
+      font: 700 0.9rem/1 var(--font-display);
+    }
+
+    .badge {
+      display: inline-grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 11px;
+      font: 700 0.95rem/1 var(--font-display);
+      color: white;
+    }
+
+    .badge.one {
+      background: var(--accent);
+    }
+
+    .badge.two {
+      background: var(--accent-2);
+    }
+
+    .badge.three {
+      background: var(--accent-3);
+      color: var(--ink);
+    }
+
+    .composer {
+      display: grid;
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font: 700 0.85rem/1 var(--font-display);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(31, 41, 51, 0.12);
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--ink);
+      font: inherit;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: 2px solid rgba(196, 73, 45, 0.28);
+      border-color: rgba(196, 73, 45, 0.38);
+    }
+
+    .preview {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px dashed rgba(31, 41, 51, 0.18);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .preview-card {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(31, 41, 51, 0.98), rgba(50, 64, 78, 0.95));
+      color: white;
+      box-shadow: 0 16px 28px rgba(31, 41, 51, 0.22);
+    }
+
+    .preview-card h3 {
+      font-size: 1.65rem;
+      letter-spacing: -0.04em;
+    }
+
+    .preview-card p {
+      color: rgba(255, 255, 255, 0.78);
+      line-height: 1.6;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .stack-grid,
+    .question-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .builder-grid {
+      display: grid;
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .question-step {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+    }
+
+    .question-step strong {
+      display: block;
+      margin-bottom: 8px;
+      font-family: var(--font-display);
+      font-size: 1rem;
+    }
+
+    .builder-help {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .choice-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .radio-card {
+      display: block;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(31, 41, 51, 0.1);
+      background: rgba(255, 255, 255, 0.84);
+      cursor: pointer;
+    }
+
+    .radio-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radio-card span {
+      display: block;
+    }
+
+    .radio-card strong {
+      display: block;
+      font-family: var(--font-display);
+      margin-bottom: 6px;
+    }
+
+    .radio-card:has(input:checked) {
+      border-color: rgba(196, 73, 45, 0.36);
+      box-shadow: 0 16px 26px rgba(58, 43, 24, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .tips-box {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+    }
+
+    .tips-box strong {
+      display: block;
+      margin-bottom: 8px;
+      font-family: var(--font-display);
+    }
+
+    .practice-grid {
+      display: grid;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .practice-card {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+    }
+
+    .practice-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-family: var(--font-display);
+      font-size: 1rem;
+    }
+
+    .feedback-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .feedback-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .feedback-item.good {
+      border-color: rgba(10, 124, 102, 0.22);
+      background: rgba(10, 124, 102, 0.08);
+      color: #19584d;
+    }
+
+    .feedback-item.warn {
+      border-color: rgba(196, 73, 45, 0.18);
+      background: rgba(196, 73, 45, 0.08);
+      color: #7e3727;
+    }
+
+    .question-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stack-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+    }
+
+    .stack-card strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1rem;
+    }
+
+    .question-button {
+      width: 100%;
+      padding: 18px;
+      border: 1px solid rgba(31, 41, 51, 0.1);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.84);
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .question-button:hover,
+    .question-button:focus-visible,
+    .question-button.active {
+      transform: translateY(-2px);
+      border-color: rgba(196, 73, 45, 0.36);
+      box-shadow: 0 16px 26px rgba(58, 43, 24, 0.08);
+    }
+
+    .question-button strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+    }
+
+    .answer-card {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(31, 41, 51, 0.08);
+    }
+
+    .answer-card h3 {
+      font-size: 1.5rem;
+      letter-spacing: -0.04em;
+    }
+
+    .answer-card p {
+      margin: 12px 0 0;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .prompt-box {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(31, 41, 51, 0.98), rgba(50, 64, 78, 0.95));
+      color: white;
+      box-shadow: 0 16px 28px rgba(31, 41, 51, 0.2);
+    }
+
+    .prompt-box p {
+      margin: 0;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.82);
+      white-space: pre-wrap;
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .faq-item {
+      border-radius: 18px;
+      border: 1px solid rgba(31, 41, 51, 0.08);
+      background: rgba(255, 255, 255, 0.7);
+      overflow: hidden;
+    }
+
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px 18px;
+      font: 700 1rem/1.35 var(--font-display);
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-item p {
+      margin: 0;
+      padding: 0 18px 18px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    code {
+      padding: 0.16rem 0.4rem;
+      border-radius: 999px;
+      background: rgba(31, 41, 51, 0.08);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.95em;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card {
+        transform: none;
+      }
+
+      h1 {
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(100% - 20px, 1120px);
+        padding-top: 12px;
+      }
+
+      .hero,
+      .panel {
+        padding: 18px;
+        border-radius: 22px;
+      }
+
+      .metric-row {
+        grid-template-columns: 1fr;
+      }
+
+      .question-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .choice-row {
+        grid-template-columns: 1fr;
+      }
+
+      .button {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="eyebrow">Beginner guide • Codex workflow • Netlify ready</div>
+      <div class="hero-grid">
+        <div>
+          <h1>Learn to build your first tool with Codex.</h1>
+          <p class="lead">
+            This single-file guide walks a beginner through the simple path:
+            install the right tools, open Codex chat, ask for a single HTML experience,
+            and publish the result with GitHub and Netlify.
+          </p>
+          <div class="cta-row">
+            <a class="button primary" href="#questions">Start with the questions</a>
+            <a class="button secondary" href="#prompt">See the first prompt</a>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="Project summary">
+          <div class="hero-card-inner">
+            <h2>What this teaches</h2>
+            <p class="muted">
+              A very simple workflow for turning an idea into a small web tool without starting with a full framework.
+            </p>
+            <div class="metric-row">
+              <div class="metric">
+                <strong>4</strong>
+                <span>Core tools</span>
+              </div>
+              <div class="metric">
+                <strong>1</strong>
+                <span>Starter prompt</span>
+              </div>
+              <div class="metric">
+                <strong>Q&amp;A</strong>
+                <span>Beginner format</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="main-grid">
+      <article class="panel" id="questions">
+        <h2>Answer these questions to build your Codex prompt</h2>
+        <p class="muted">
+          Type your answers below. As you answer each question, this page writes a better prompt for you to paste into Codex.
+        </p>
+
+        <div class="builder-grid">
+          <div class="question-step">
+            <strong>1. What are you looking to build?</strong>
+            <div class="field">
+            <label for="toolIdea">Your idea</label>
+            <input id="toolIdea" type="text" value="a simple learning guide for beginners">
+            <p class="builder-help">Say it in everyday words, like “a checklist,” “a quiz,” “a calculator,” or “a page that teaches someone one thing.”</p>
+            </div>
+          </div>
+
+          <div class="question-step">
+            <strong>2. Who is the audience?</strong>
+            <div class="field">
+            <label for="toolAudience">Who will use it?</label>
+            <input id="toolAudience" type="text" value="someone just starting out">
+            </div>
+          </div>
+
+          <div class="question-step">
+            <strong>3. What should the user be able to do?</strong>
+            <div class="field">
+            <label for="toolGoal">What should happen for the user?</label>
+            <textarea id="toolGoal" rows="4">Answer simple questions, understand the next step, and get a helpful prompt they can paste into Codex.</textarea>
+            </div>
+          </div>
+
+          <div class="question-step">
+            <strong>4. What kind of experience should it feel like?</strong>
+            <div class="field">
+            <label>Pick a style</label>
+            <div class="choice-row">
+              <label class="radio-card">
+                <input type="radio" name="experienceType" value="question and answer" checked>
+                <span>
+                  <strong>Question and answer</strong>
+                  Simple prompts and answers on the page.
+                </span>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="experienceType" value="step by step walkthrough">
+                <span>
+                  <strong>Step by step</strong>
+                  A guided path with one step after another.
+                </span>
+              </label>
+            </div>
+            </div>
+          </div>
+
+          <div class="question-step">
+            <strong>5. What must be included?</strong>
+            <div class="field">
+            <label for="mustInclude">Important details</label>
+            <textarea id="mustInclude" rows="4">Explain what the Codex app is, remind the user to use the Codex app and not a plugin, include GitHub and Netlify, and keep the language simple.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips-box">
+          <strong>How this helps</strong>
+          Good prompts tell Codex four things: what to build, who it is for, what the person should be able to do, and what the final format should look like.
+        </div>
+
+        <div class="prompt-box" id="prompt">
+          <h3>Your Codex prompt</h3>
+          <p id="promptText"></p>
+        </div>
+
+        <div class="cta-row">
+          <button class="button primary" id="copyButton" type="button">Copy prompt for Codex</button>
+        </div>
+
+        <p class="footer-note" id="copyStatus">Tip: after Codex gives you a first version, ask for small improvements instead of rewriting everything at once.</p>
+
+        <div class="practice-grid">
+          <div class="practice-card">
+            <strong>Practice prompt challenge</strong>
+            <p class="muted">
+              Try this example: someone wants a simple single HTML tool that helps a new manager run a 1:1 meeting.
+              The page should ask a few questions, suggest a meeting plan, and feel easy for a beginner to use.
+            </p>
+            <p class="muted">
+              Write the first prompt you would give Codex for that use case. Then look at the feedback below.
+            </p>
+          </div>
+
+          <div class="question-step">
+            <strong>Practice writing your first prompt</strong>
+            <div class="field">
+              <label for="practicePrompt">Your practice prompt</label>
+              <textarea id="practicePrompt" rows="6">Build me a single HTML application for a new manager. It should help them run a 1:1 meeting and be simple for a beginner to use.</textarea>
+              <p class="builder-help">Do not worry about making it perfect. This section is here to help you improve it.</p>
+            </div>
+          </div>
+
+          <div class="practice-card">
+            <strong>Feedback on your draft</strong>
+            <div id="practiceFeedback" class="feedback-list" aria-live="polite"></div>
+          </div>
+        </div>
+      </article>
+
+      <aside class="panel">
+        <h2>Install these first</h2>
+        <div class="stack-grid">
+          <div class="stack-card">
+            <strong>Codex app</strong>
+            <div class="muted">Download the Codex app, not a plugin, because it lets you start building right away. You tell it what you want, and it helps make the tool for you.</div>
+          </div>
+          <div class="stack-card">
+            <strong>GitHub</strong>
+            <div class="muted">Download GitHub because it is like a safe folder for your project on the internet. It helps you keep your work, share it, and connect it to your website.</div>
+          </div>
+          <div class="stack-card">
+            <strong>Netlify</strong>
+            <div class="muted">Download or sign up for Netlify because it is the helper that puts your page on the internet. It takes your file and gives it a real website home.</div>
+          </div>
+          <div class="stack-card">
+            <strong>Optional editor</strong>
+            <div class="muted">A code editor is like a neat writing desk for code. It is helpful later, but you do not need Visual Studio Code just to begin if you are using the Codex app.</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel" id="deploy">
+      <h2>What the full beginner flow looks like</h2>
+      <p class="muted">
+        The goal is to make the process feel small, not overwhelming.
+      </p>
+      <ol class="deploy-steps">
+        <li class="deploy-step">
+          <span class="step-pill">1</span>
+          <div>
+            <strong>Install the Codex app, GitHub, and Netlify access</strong>
+            <div class="muted">Make sure you can open the Codex app, create or use a GitHub repo, and sign in to Netlify.</div>
+          </div>
+        </li>
+        <li class="deploy-step">
+          <span class="step-pill">2</span>
+          <div>
+            <strong>Ask Codex for one simple deliverable</strong>
+            <div class="muted">A strong first request is a single HTML application with no framework and beginner-friendly content.</div>
+          </div>
+        </li>
+        <li class="deploy-step">
+          <span class="step-pill">3</span>
+          <div>
+            <strong>Keep the output lightweight</strong>
+            <div class="muted">A root-level <code>index.html</code> is easy to understand, edit, commit, and deploy.</div>
+          </div>
+        </li>
+        <li class="deploy-step">
+          <span class="step-pill">4</span>
+          <div>
+            <strong>Push the repo to GitHub</strong>
+            <div class="muted">Once the file is in the repo, GitHub becomes the source Netlify watches.</div>
+          </div>
+        </li>
+        <li class="deploy-step">
+          <span class="step-pill">5</span>
+          <div>
+            <strong>Connect the repo to Netlify</strong>
+            <div class="muted">For a simple HTML site, the repo root can be published directly without a build command.</div>
+          </div>
+        </li>
+      </ol>
+
+      <div class="faq-list">
+        <details class="faq-item" open>
+          <summary>Why does this page ask me questions first?</summary>
+          <p>Beginners often know what they want, but not how to ask for it. These questions turn a fuzzy idea into a clearer prompt that Codex can use.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What makes a good first Codex prompt?</summary>
+          <p>A strong first prompt says what to build, who it is for, what it should help the user do, and that the result should be a single HTML application.</p>
+        </details>
+        <details class="faq-item">
+          <summary>When should I make the prompt more detailed?</summary>
+          <p>Add more detail after the first version works. Ask for clearer wording, a different look, or extra sections only after you have a simple starting point.</p>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const toolIdea = document.getElementById("toolIdea");
+    const toolAudience = document.getElementById("toolAudience");
+    const toolGoal = document.getElementById("toolGoal");
+    const mustInclude = document.getElementById("mustInclude");
+    const experienceTypes = document.querySelectorAll('input[name="experienceType"]');
+    const practicePrompt = document.getElementById("practicePrompt");
+    const practiceFeedback = document.getElementById("practiceFeedback");
+    const promptText = document.getElementById("promptText");
+    const copyButton = document.getElementById("copyButton");
+    const copyStatus = document.getElementById("copyStatus");
+
+    function selectedExperience() {
+      const checked = document.querySelector('input[name="experienceType"]:checked');
+      return checked ? checked.value : "question and answer";
+    }
+
+    function buildPrompt() {
+      const idea = toolIdea.value.trim() || "a simple tool";
+      const audience = toolAudience.value.trim() || "a beginner";
+      const goal = toolGoal.value.trim() || "understand the next step";
+      const include = mustInclude.value.trim() || "keep the language simple";
+      const experience = selectedExperience();
+
+      return [
+        `Build me a single HTML application about ${idea}.`,
+        `It is for ${audience}.`,
+        `The experience should feel like a ${experience}.`,
+        `The user should be able to ${goal}.`,
+        "Please keep everything in one self-contained HTML file with inline CSS and JavaScript.",
+        `Please include these details: ${include}.`,
+        "Keep the language simple, friendly, and easy for a beginner to understand."
+      ].join(" ");
+    }
+
+    function refreshPrompt() {
+      promptText.textContent = buildPrompt();
+    }
+
+    function buildFeedbackItems(prompt) {
+      const text = prompt.trim();
+      const lower = text.toLowerCase();
+      const items = [];
+
+      if (!text) {
+        items.push({
+          tone: "warn",
+          text: "Start by writing a first draft. Even a short prompt is enough to improve."
+        });
+        return items;
+      }
+
+      if (lower.includes("single html") || lower.includes("one html") || lower.includes("self-contained html")) {
+        items.push({
+          tone: "good",
+          text: "Nice job telling Codex the format. Asking for a single HTML app keeps the result simple."
+        });
+      } else {
+        items.push({
+          tone: "warn",
+          text: "Add the format you want, like 'single HTML application,' so Codex knows to keep everything in one file."
+        });
+      }
+
+      if (lower.includes("for ") || lower.includes("audience") || lower.includes("beginner") || lower.includes("new manager")) {
+        items.push({
+          tone: "good",
+          text: "You gave Codex an audience. That helps it choose the right tone and level of detail."
+        });
+      } else {
+        items.push({
+          tone: "warn",
+          text: "Say who the tool is for. For example: 'for a new manager' or 'for someone just starting out.'"
+        });
+      }
+
+      if (lower.includes("help") || lower.includes("should") || lower.includes("able to") || lower.includes("ask")) {
+        items.push({
+          tone: "good",
+          text: "You described what the tool should do. That gives Codex a clearer goal."
+        });
+      } else {
+        items.push({
+          tone: "warn",
+          text: "Explain what the user should be able to do, like answer questions, make a plan, or learn a topic."
+        });
+      }
+
+      if (lower.includes("simple") || lower.includes("friendly") || lower.includes("easy")) {
+        items.push({
+          tone: "good",
+          text: "You told Codex how the experience should feel. That helps shape the final result."
+        });
+      } else {
+        items.push({
+          tone: "warn",
+          text: "Add how you want it to feel, like simple, friendly, beginner-friendly, or step by step."
+        });
+      }
+
+      if (text.length < 90) {
+        items.push({
+          tone: "warn",
+          text: "This draft is a little short. Try adding one more sentence about what the page should include."
+        });
+      } else {
+        items.push({
+          tone: "good",
+          text: "This has enough detail for a solid first try. You can always refine it after Codex gives you version one."
+        });
+      }
+
+      items.push({
+        tone: "good",
+        text: "A stronger version might name the audience, the actions on the page, and that the result should be a self-contained HTML file with inline CSS and JavaScript."
+      });
+
+      return items;
+    }
+
+    function refreshPracticeFeedback() {
+      const items = buildFeedbackItems(practicePrompt.value);
+      practiceFeedback.innerHTML = items
+        .map((item) => `<div class="feedback-item ${item.tone}">${item.text}</div>`)
+        .join("");
+    }
+
+    async function copyPrompt() {
+      try {
+        await navigator.clipboard.writeText(buildPrompt());
+        copyStatus.textContent = "Prompt copied. Paste it into Codex chat, then ask for small improvements after the first version appears.";
+      } catch (error) {
+        copyStatus.textContent = "Clipboard copy is blocked in this browser. You can still read the prompt and paste it manually.";
+      }
+    }
+
+    [toolIdea, toolAudience, toolGoal, mustInclude].forEach((field) => {
+      field.addEventListener("input", refreshPrompt);
+    });
+    experienceTypes.forEach((field) => {
+      field.addEventListener("change", refreshPrompt);
+    });
+    practicePrompt.addEventListener("input", refreshPracticeFeedback);
+    copyButton.addEventListener("click", copyPrompt);
+    refreshPrompt();
+    refreshPracticeFeedback();
+  </script>
+</body>
+</html>
