@@ -919,22 +919,63 @@
       return checked ? checked.value : "question and answer";
     }
 
+    function cleanSentence(value) {
+      return value.trim().replace(/\s+/g, " ").replace(/[.]+$/g, "");
+    }
+
+    function ensureSentence(value) {
+      const trimmed = cleanSentence(value);
+      if (!trimmed) {
+        return "";
+      }
+
+      return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+    }
+
+    function normalizeAudience(value) {
+      const trimmed = cleanSentence(value);
+      if (!trimmed) {
+        return "a beginner";
+      }
+
+      return trimmed
+        .replace(/^it is for\s+/i, "")
+        .replace(/^for\s+/i, "")
+        .replace(/^i will use it\s+/i, "")
+        .replace(/^this is for\s+/i, "");
+    }
+
+    function normalizeGoal(value) {
+      const trimmed = cleanSentence(value);
+      if (!trimmed) {
+        return "help the user understand the next step";
+      }
+
+      return trimmed
+        .replace(/^the user should be able to\s+/i, "")
+        .replace(/^user should be able to\s+/i, "")
+        .replace(/^should be able to\s+/i, "");
+    }
+
     function buildPrompt() {
-      const idea = toolIdea.value.trim() || "a simple tool";
-      const audience = toolAudience.value.trim() || "a beginner";
-      const goal = toolGoal.value.trim() || "understand the next step";
-      const include = mustInclude.value.trim() || "keep the language simple";
+      const idea = cleanSentence(toolIdea.value) || "a simple tool";
+      const audience = normalizeAudience(toolAudience.value);
+      const goal = normalizeGoal(toolGoal.value);
+      const include = cleanSentence(mustInclude.value) || "keep the language simple";
       const experience = selectedExperience();
 
       return [
-        `Build me a single HTML application about ${idea}.`,
-        `It is for ${audience}.`,
+        `Build me a single HTML application for ${idea}.`,
+        `The audience is ${audience}.`,
         `The experience should feel like a ${experience}.`,
         `The user should be able to ${goal}.`,
         "Please keep everything in one self-contained HTML file with inline CSS and JavaScript.",
         `Please include these details: ${include}.`,
         "Keep the language simple, friendly, and easy for a beginner to understand."
-      ].join(" ");
+      ]
+        .map(ensureSentence)
+        .filter(Boolean)
+        .join(" ");
     }
 
     function refreshPrompt() {
