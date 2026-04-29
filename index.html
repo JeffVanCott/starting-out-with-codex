@@ -722,7 +722,7 @@
             <strong>1. What are you looking to build?</strong>
             <div class="field">
             <label for="toolIdea">Your idea</label>
-            <input id="toolIdea" type="text" value="a simple learning guide for beginners">
+            <input id="toolIdea" type="text" value="a simple learning guide for beginners" data-pristine="true">
             <p class="builder-help">Say it in everyday words, like “a checklist,” “a quiz,” “a calculator,” or “a page that teaches someone one thing.”</p>
             </div>
           </div>
@@ -731,7 +731,7 @@
             <strong>2. Who is the audience?</strong>
             <div class="field">
             <label for="toolAudience">Who will use it?</label>
-            <input id="toolAudience" type="text" value="someone just starting out">
+            <input id="toolAudience" type="text" value="someone just starting out" data-pristine="true">
             </div>
           </div>
 
@@ -739,7 +739,7 @@
             <strong>3. What should the user be able to do?</strong>
             <div class="field">
             <label for="toolGoal">What should happen for the user?</label>
-            <textarea id="toolGoal" rows="4">Answer simple questions, understand the next step, and get a helpful prompt they can paste into Codex.</textarea>
+            <textarea id="toolGoal" rows="4" data-pristine="true">Answer simple questions, understand the next step, and get a helpful prompt they can paste into Codex.</textarea>
             </div>
           </div>
 
@@ -770,7 +770,7 @@
             <strong>5. What must be included?</strong>
             <div class="field">
             <label for="mustInclude">Important details</label>
-            <textarea id="mustInclude" rows="4">Explain what the Codex app is, remind the user to use the Codex app and not a plugin, include GitHub and Netlify, and keep the language simple.</textarea>
+            <textarea id="mustInclude" rows="4" data-pristine="true">Explain what the Codex app is, remind the user to use the Codex app and not a plugin, include GitHub and Netlify, and keep the language simple.</textarea>
             </div>
           </div>
         </div>
@@ -807,7 +807,7 @@
             <strong>Practice writing your first prompt</strong>
             <div class="field">
               <label for="practicePrompt">Your practice prompt</label>
-              <textarea id="practicePrompt" rows="6">Build me a single HTML application for a new manager. It should help them run a 1:1 meeting and be simple for a beginner to use.</textarea>
+              <textarea id="practicePrompt" rows="6" data-pristine="true">Build me a single HTML application for a new manager. It should help them run a 1:1 meeting and be simple for a beginner to use.</textarea>
               <p class="builder-help">Do not worry about making it perfect. This section is here to help you improve it.</p>
             </div>
           </div>
@@ -1070,6 +1070,18 @@
         .join("");
     }
 
+    function setupGuidedInput(field) {
+      field.addEventListener("focus", () => {
+        if (field.dataset.pristine === "true") {
+          field.select();
+        }
+      });
+
+      field.addEventListener("input", () => {
+        field.dataset.pristine = "false";
+      });
+    }
+
     async function copyPrompt() {
       try {
         await navigator.clipboard.writeText(buildPrompt());
@@ -1079,6 +1091,9 @@
       }
     }
 
+    [toolIdea, toolAudience, toolGoal, mustInclude, practicePrompt].forEach((field) => {
+      setupGuidedInput(field);
+    });
     [toolIdea, toolAudience, toolGoal, mustInclude].forEach((field) => {
       field.addEventListener("input", refreshPrompt);
     });
